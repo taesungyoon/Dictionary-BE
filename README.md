@@ -8,7 +8,6 @@ Setting up for the expressjs to work
  <p>cd server</p>
  <p> npm init -y</p>
 <h3>make a new files.js</h3>
- <p>touch server.js</p>
  <p>   npm install express </p>
   <p>  npm install nodemon -D </p>
  <h3> to the folder </h3>
