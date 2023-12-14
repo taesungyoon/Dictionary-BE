@@ -13,4 +13,4 @@ Setting up for the expressjs to work
  <h3> to the folder </h3>
 <p>    cd server </p>
  <p>   npm run dev </p>
-
+<P>npm install cors</P>
