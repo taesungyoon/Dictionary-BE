@@ -58,7 +58,28 @@ app.post('/signup', (req, res) => {
     });
 });
 
-// Dictionary - Search, Autocomplete, and Search History endpoints
+// Dictionary - Search, Autocomplete, today sentence and Search History endpoints
+
+
+// New feature for today sentence
+app.get('/randomWord', (req, res) => {
+    const sql = 'SELECT lemma, definition FROM words ORDER BY RANDOM() LIMIT 1';
+  
+    dbDictionary.get(sql, [], (err, row) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      if (row) {
+        res.json(row); 
+      } else {
+        res.status(404).json({ message: 'No words found' });
+      }
+    });
+  });
+
+  
+
 app.get('/search/:word', (req, res) => {
     const sql = 'SELECT lemma, synonyms, antonyms, definition FROM words WHERE lemma = ?';
 
@@ -79,7 +100,7 @@ app.get('/search/:word', (req, res) => {
 
 app.get('/autocomplete/:partialWord', (req, res) => {
     const partialWord = req.params.partialWord;
-    const sql = 'SELECT lemma FROM words WHERE lemma LIKE ? LIMIT 10';
+    const sql = 'SELECT lemma FROM words WHERE lemma LIKE ?';
 
     dbDictionary.all(sql, [`${partialWord}%`], (err, rows) => {
         if (err) {
