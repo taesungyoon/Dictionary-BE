@@ -22,9 +22,29 @@ const dbDictionary = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE, (err) 
         console.error('Error connecting to the database:', err.message);
     } else {
         console.log('Connected to the dictionary database.');
+        // Create the search_history table if it doesn't exist
+        const createSearchHistoryTable = () => {
+            const sql = `
+                CREATE TABLE IF NOT EXISTS search_history (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    term TEXT NOT NULL,
+                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+                );               
+            `;
+        
+            dbDictionary.exec(sql, (err) => {
+                if (err) {
+                    console.error("Error creating tables:", err.message);
+                } else {
+                    console.log("Tables created successfully");
+                }
+            });
+        };
+        
+        createSearchHistoryTable();
+        
     }
 });
-
 // Access - Validate Password and Signup endpoints
 app.post('/validatePassword', (req, res) => {
     const { username, password } = req.body;
@@ -44,6 +64,8 @@ app.post('/validatePassword', (req, res) => {
         }
     });
 });
+
+
 
 app.post('/signup', (req, res) => {
     const { username, password } = req.body;
@@ -79,6 +101,21 @@ app.get('/randomWord', (req, res) => {
   });
 
   
+  app.post('/api/favorite/:word', (req, res) => {
+    const { word } = req.params;
+
+    // Assuming you have a 'favorites' table in your database
+    const sql = 'INSERT INTO favorites (term) VALUES (?)';
+    dbDictionary.run(sql, [word], (err) => {
+        if (err) {
+            console.error('Error marking word as favorite:', err.message);
+            res.status(500).json({ error: 'Internal server error' });
+            return;
+        }
+
+        res.json({ success: true });
+    });
+});
 
 app.get('/search/:word', (req, res) => {
     const sql = 'SELECT lemma, synonyms, antonyms, definition FROM words WHERE lemma = ?';
@@ -124,6 +161,45 @@ app.get('/api/searchHistory', (req, res) => {
         res.json(searchHistory);
     });
 });
+
+app.get("/api/IELTS", (req, res) => {
+  const sql = "SELECT lemma FROM IELTS";
+
+  dbCollection.all(sql, [], (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    const IELTS = rows.map((row) => row.lemma);
+    res.json(IELTS);
+  });
+});
+app.get("/api/TOEFL", (req, res) => {
+  const sql = "SELECT lemma FROM TOEFL";
+
+  dbCollection.all(sql, [], (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    const TOEFL = rows.map((row) => row.lemma);
+    res.json(TOEFL);
+  });
+});
+
+app.get('/api/favorites', (req, res) => {
+    const sql = 'SELECT term FROM favorites ORDER BY timestamp DESC';
+
+    dbDictionary.all(sql, [], (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        const favorites = rows.map((row) => row.term);
+        res.json(favorites);
+    });
+});
+
 
 app.get('/', (req, res) => {
     res.send('Dictionary Database is connected.');
