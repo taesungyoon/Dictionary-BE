@@ -162,6 +162,31 @@ app.get('/api/searchHistory', (req, res) => {
     });
 });
 
+app.get("/api/IELTS", (req, res) => {
+  const sql = "SELECT lemma FROM IELTS";
+
+  dbCollection.all(sql, [], (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    const IELTS = rows.map((row) => row.lemma);
+    res.json(IELTS);
+  });
+});
+app.get("/api/TOEFL", (req, res) => {
+  const sql = "SELECT lemma FROM TOEFL";
+
+  dbCollection.all(sql, [], (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    const TOEFL = rows.map((row) => row.lemma);
+    res.json(TOEFL);
+  });
+});
+
 app.get('/api/favorites', (req, res) => {
     const sql = 'SELECT term FROM favorites ORDER BY timestamp DESC';
 
