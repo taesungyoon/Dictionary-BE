@@ -353,7 +353,7 @@ app.get('/api/userSearchHistory/:userId', (req, res) => {
         res.status(500).send({ error: 'Internal server error' });
         return;
       }
-      if (row) {
+      if (row) {//this is important to stop the duplicate so dont mind the console error
         res.json({ success: false, message: 'Words already exists in history' });
       } else {
         const sql = 'INSERT INTO user_search_history (userId, term) VALUES (?, ?)';
